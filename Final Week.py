@@ -2,7 +2,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-#import statsmodels.api as sm
+import statsmodels.api as sm
 from sklearn.linear_model import LinearRegression
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -17,7 +17,7 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 
 #PART A : Access the dataset
-path = r"C:\Users\dhruv\OneDrive\Desktop\Project Nikhil Sir\states90.xlsx"
+path = r"C:\Users\dhruv\OneDrive\Desktop\Project Nikhil Sir\MLR Project\states90.xlsx"
 df = pd.read_excel(path)
 print(df)
     
@@ -37,12 +37,7 @@ print(df.info())
 ## college :  % of people over 25 with Bachelor's Degree '''
 
 
-#PART D : Scatterplot matrix and boxplots of csat by region
-
-#Scatterplot Matrix
-
-
-
+#PART D : Boxplots of csat by region
 
 #Boxplots
 sns.boxplot(x=df['region'],y=df['csat'])
@@ -51,21 +46,19 @@ plt.show()
 
 #PART E : Fitting SLRs
 
-#fitting SLRs for expense, percent, income, high, college to observe their individual effect on csat
+#fitting SLRs for expense, percent, income, high, college to observe 
+#their individual effect on csat
 
 #expense
 X = df["expense"]
 Y = df["csat"]
 
-#adding the constant
-const = sm.add_constant(X)
+const = sm.add_constant(X) #adding the constant
 
-#fitting the model
-model = sm.OLS(Y,const).fit()
+model = sm.OLS(Y,const).fit() #fitting the model
 print(model.summary())
 
-#visualizing
-plt.scatter(X,Y,color = "blue")
+plt.scatter(X,Y,color = "blue") #visualizing
 plt.plot(X, 1060.7324 - 0.0223*X, 'r')
 plt.xlabel("expense")
 plt.ylabel("csat")
@@ -79,15 +72,13 @@ plt.show()
 X = df["percent"]
 Y = df["csat"]
 
-#adding the constant
-const = sm.add_constant(X)
+const = sm.add_constant(X) #adding the constant
 
-model = sm.OLS(Y,const).fit()
+
+model = sm.OLS(Y,const).fit() #fitting the model
 print(model.summary())
 
-
-#visualizing
-plt.scatter(X,Y,color = "blue")
+plt.scatter(X,Y,color = "blue") #visualizing
 plt.plot(X, 1024.1429 - 2.2381*X, 'r')
 plt.xlabel("percent")
 plt.ylabel("csat")
@@ -101,14 +92,13 @@ plt.show()
 X = df["income"]
 Y = df["csat"]
 
-#adding the constant
-const = sm.add_constant(X)
 
-model = sm.OLS(Y,const).fit()
+const = sm.add_constant(X) #adding the constant
+
+model = sm.OLS(Y,const).fit() #fitting the model
 print(model.summary())
 
-#visualizing
-plt.scatter(X,Y,color = "blue")
+plt.scatter(X,Y,color = "blue") #visualizing
 plt.plot(X, 1110.8575 - 0.0049*X, 'r')
 plt.xlabel("income")
 plt.ylabel("csat")
@@ -121,14 +111,12 @@ plt.show()
 X = df["high"]
 Y = df["csat"]
 
-#adding the constant
-const = sm.add_constant(X)
+const = sm.add_constant(X) #adding the constant
 
-model = sm.OLS(Y,const).fit()
+model = sm.OLS(Y,const).fit() #fitting the model
 print(model.summary())
 
-#visualizing
-plt.scatter(X,Y,color = "blue")
+plt.scatter(X,Y,color = "blue") #visualizing
 plt.plot(X, 865.7524 + 1.0273*X, 'r')
 plt.xlabel("high")
 plt.ylabel("csat")
@@ -141,13 +129,12 @@ plt.show()
 X = df["college"]
 Y = df["csat"]
 
-#adding the constant
-const = sm.add_constant(X)
-model = sm.OLS(Y,const).fit()
+const = sm.add_constant(X) #adding the constant
+
+model = sm.OLS(Y,const).fit() #fitting the model
 print(model.summary())
 
-#visualizing
-plt.scatter(X,Y,color = "blue")
+plt.scatter(X,Y,color = "blue") #visualizing
 plt.plot(X, 1064.0749 - 5.9924*X, 'r')
 plt.xlabel("college")
 plt.ylabel("csat")
@@ -163,6 +150,9 @@ df1 = df.drop(["state","pop","area","density","vsat","msat"], axis=1)
 #Forming dummy variables
 df2 = pd.get_dummies(df1)
 df3 = df2.drop(["region_West"], axis = 1)
+df3["region_Midwest"] = df3["region_Midwest"].astype(int)
+df3["region_South"] = df3["region_South"].astype(int)
+df3["region_NEast"] = df3["region_NEast"].astype(int)
 
 
 #region_Midwest
@@ -276,11 +266,11 @@ result3 = smf.ols(formula, data = df3).fit()
 print(result3.summary())
 
 
-#FITTING THE QUADRATIC TERM
+#FITTING AND PLOTTING THE QUADRATIC TERM
 
 percent2 = df["percent"]**2
 df2 = pd.get_dummies(df1)
-df4 = df3.insert(2, "percentsq", percent2, True)
+df3.insert(2, "percentsq", percent2, True)
 
 #Defining independent and dependent variables
 dep_var = "csat"
@@ -315,14 +305,6 @@ est = sm.OLS(Y, const).fit()
 print(est.summary())
 
 
-
-#interaction 2
-formula = 'csat ~ percent + percentsq + expense + income + high + college + region_Midwest*percent + region_NEast*percent + region_South*percent'
-result3 = smf.ols(formula, data = df3).fit()
-print(result3.summary())
-
-
-    
 X = df3["percentsq"]
 Y = df["csat"]
 #adding the constant
@@ -344,40 +326,6 @@ plt.xlabel("percent square")
 plt.ylabel("csat")
 plt.title("Linear Regression for percent squared vs csat")
 plt.show()
-
-
-
-
-#Defining independent and dependent variables
-dep_var = "csat"
-ind_var = df3.columns.tolist()
-ind_var.remove("csat")
-
-#Assigning X (independent variables) and Y (dependent variable)
-X = df3[ind_var]
-Y = df1[dep_var]
-
-
-#Splitting the dataset into TRAIN and TEST
-X_train,X_test,Y_train,Y_test = train_test_split(X, Y, test_size = 0.2, random_state = 0)
-
-
-#Transforming data
-scaler = MinMaxScaler()
-X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
-
-
-#Fitting MLR
-regressor = LinearRegression()
-regressor.fit(X_train,Y_train)
-
-
-#Fit an OLS model with intercept
-const = sm.add_constant(X)
-est = sm.OLS(Y, const).fit() 
-print(est.summary())
-
 
 
 
